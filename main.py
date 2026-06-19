@@ -24,8 +24,17 @@ ucirc = SDF(func=SDF.circle, ID=1)
 
 tree = VPTree(points, circs, ucirc)
 tree.split()
-left = tree.left.sdfs
-right = tree.right.sdfs
-for i in range (len(left)):
-    print("left circle: ", left[i].ID, "with distance")
-print(tree.left.sdfs, tree.right.sdfs)
+left_branch = tree.left
+right_branch = tree.right 
+
+tree.report()
+tree.left.report()
+tree.right.report()
+if left_branch.left:
+    left_branch.left.report()
+if left_branch.right:
+    left_branch.right.report()   
+if right_branch.left:
+    right_branch.left.report()
+if right_branch.right:
+    right_branch.right.report()

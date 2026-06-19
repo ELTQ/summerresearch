@@ -23,9 +23,11 @@ class VPTree:
         self.difference = -1 # difference from the sdf contained at this node to the neutral sdf
         
     def split(self):
-        sdfs = self.sdfs
-        self.sdfs = None
-        if not sdfs:
+        if len(self.sdfs) == 1:
+            self.chosen_sdf = self.sdfs[0]
+            self.difference = mse(self.points, self.chosen_sdf, self.neutral)
+            return
+        if len(self.sdfs) < 1:
             return
         
         base = self.neutral
@@ -37,22 +39,29 @@ class VPTree:
         median_mse = sorted(mses)[len(mses) // 2]
         median_index = mses.index(median_mse)
         
-        for sdf in self.sdfs[0:median_index] + self.sdfs[median_index+1:]:
+        for sdf in (self.sdfs[0:median_index] + self.sdfs[median_index+1:]):
             if mse(self.points, base, sdf) < median_mse:
                 left_sdfs.append(sdf)
+            elif (mse(self.points, base, sdf) == median_mse):
+                print("This shouldn't be happening!")
             else:
                 right_sdfs.append(sdf)
-        
-        self.left = VPTree(self.points, left_sdfs, self.neutral)
-        self.right = VPTree(self.points, right_sdfs, self.neutral)
-        
-        self.left.split()
-        self.right.split()
+
+        if (len(left_sdfs) > 0): # don't make a child node if there's nothing to put in it
+            self.left = VPTree(self.points, left_sdfs, self.neutral)
+            self.left.split()
+
+        if (len(right_sdfs) > 0): # don't make a child node if there's nothing to put in it
+            self.right = VPTree(self.points, right_sdfs, self.neutral)
+            self.right.split()
+
+        self.chosen_sdf = self.sdfs[median_index]
+        self.difference = median_mse
+
 
     def report(self):
         print("Difference is: ", self.difference)
-        print("ID is: ", self.sdfs[0].ID)
-        print("")
+        print("ID is: ", self.chosen_sdf.ID)
 
 
         lower_sdfs = [other_sdfs[i] for i in order[:median]]

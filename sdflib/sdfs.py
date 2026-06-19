@@ -1,5 +1,3 @@
-
-
 # SDF objects class
 class SDF:
     def __init__(self, func, ID=0): 
