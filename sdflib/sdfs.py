@@ -1,5 +1,5 @@
-import math
-from vpt.tree import mse
+
+
 # SDF objects class
 class SDF:
     def __init__(self, func, ID=0): 
@@ -29,4 +29,7 @@ class SDF:
     
     def compare(self, other, points):
         # compare two SDFs 
-        return mse(points, self, other)
+        total = 0
+        for x, y in points:
+            total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
+        return (total / len(points))
