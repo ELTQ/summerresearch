@@ -1,23 +1,8 @@
 # SDF objects class
 class SDF:
-    def __init__(self, func, ID=0): 
+    def __init__(self, func, cx, cy ): 
         self.func = func
-        self.ID = ID
-        match ID: # get some random midpoints 
-            case 1: 
-                self.midpoint = (0, 1)
-            case 2:
-                self.midpoint = (1, 0)
-            case 3:
-                self.midpoint = (3, 4)
-            case 4: 
-                self.midpoint = (-4, -5)
-            case 5:
-                self.midpoint = (5, -6)
-            case 6:
-                self.midpoint = (-2, 4)
-            case _: # if ID is not specified, set midpoint to (0, 0)
-                self.midpoint = (0, 0)
+        self.midpoint = (cx, cy)
 
     def circle(self, x, y, r = 1.0):
         cx = self.midpoint[0]
