@@ -10,40 +10,40 @@ def mse(points, sdf1, sdf2):
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
     
-    def __init__(self, points, sdfs, ucirc):
+    def __init__(self, points, sdfs):
         self.points = points
         self.sdfs = sdfs
+        self.sdf = None
+        self.threshold = 0.0
         self.left = None
         self.right = None
-        self.ucirc = ucirc
 
     def split(self):
-        if len(self.sdfs) <= 1:
+        sdfs = self.sdfs
+        self.sdfs = None
+        if not sdfs:
             return
         
-        base = self.ucirc
-        pivot = self.sdfs[0]
-        left_sdfs = []
-        right_sdfs = []
-        mses = []
-        for sdf in self.sdfs:
-            mses.append(mse(self.points, base, sdf))
-        median_mse = sorted(mses)[len(mses) // 2]
-        median_index = mses.index(median_mse)
+        self.sdf = sdfs[0]  # choose the first SDF as the pivot
+        other_sdfs = sdfs[1:]
+        if not other_sdfs:
+            return
         
-        for sdf in self.sdfs[0:median_index] + self.sdfs[median_index+1:]:
-            if mse(self.points, pivot, sdf) < median_mse:
-                left_sdfs.append(sdf)
-            else:
-                right_sdfs.append(sdf)
-        
-        self.left = VPTree(self.points, left_sdfs, self.ucirc)
-        self.right = VPTree(self.points, right_sdfs, self.ucirc)
-        
-        self.left.split()
-        self.right.split()
+        mses = [mse(self.points, self.sdf, sdf) for sdf in other_sdfs]
 
+        order = sorted(range(len(other_sdfs)), key=lambda i: mses[i])
+        median = len(order) // 2
+        self.threshold = mses[order[median]]
 
+        lower_sdfs = [other_sdfs[i] for i in order[:median]]
+        upper_sdfs = [other_sdfs[i] for i in order[median:]]
 
+        if lower_sdfs:
+            self.left = VPTree(self.points, lower_sdfs)
+            self.left.split()
+        if upper_sdfs:
+            self.right = VPTree(self.points, upper_sdfs)
+            self.right.split()
 
-        
+#search for the k nearest neighbors of a given SDF in the VPTree
+    #def search(self, target_sdf, k=1):
