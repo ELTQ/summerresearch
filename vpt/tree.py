@@ -1,9 +1,6 @@
 # VPTree implementation for SDFs
 
 # calculate mean squared error between two SDFs over a set of points
-from sdflib.sdfs import SDF
-
-
 def mse(points, sdf1, sdf2):
     total = 0
     for x, y in points:
@@ -13,56 +10,30 @@ def mse(points, sdf1, sdf2):
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
     
-    def __init__(self, points, sdfs, neutral = SDF(func=SDF.circle, ID=1)):
+    def __init__(self, points, sdfs):
         self.points = points
-        self.sdfs = sdfs # list of SDFs that this node contains
-        self.chosen_sdf = None # the SDF that this node contains
-        self.left = None # left child node
-        self.right = None # right child node
-        self.neutral = neutral # the neutral point of comparison. default: unit circle at (0, 0)
-        self.difference = -1 # difference from the sdf contained at this node to the neutral sdf
-        
+        self.sdfs = sdfs
+        self.sdf = None
+        self.threshold = 0.0
+        self.left = None
+        self.right = None
+
     def split(self):
-        if len(self.sdfs) == 1:
-            self.chosen_sdf = self.sdfs[0]
-            self.difference = mse(self.points, self.chosen_sdf, self.neutral)
-            return
-        if len(self.sdfs) < 1:
+        sdfs = self.sdfs
+        self.sdfs = None
+        if not sdfs:
             return
         
-        base = self.neutral
-        left_sdfs = []
-        right_sdfs = []
-        mses = []
-        for sdf in self.sdfs:
-            mses.append(mse(self.points, base, sdf))
-        median_mse = sorted(mses)[len(mses) // 2]
-        median_index = mses.index(median_mse)
+        self.sdf = sdfs[0]  # choose the first SDF as the pivot
+        other_sdfs = sdfs[1:]
+        if not other_sdfs:
+            return
         
-        for sdf in (self.sdfs[0:median_index] + self.sdfs[median_index+1:]):
-            if mse(self.points, base, sdf) < median_mse:
-                left_sdfs.append(sdf)
-            elif (mse(self.points, base, sdf) == median_mse):
-                print("This shouldn't be happening!")
-            else:
-                right_sdfs.append(sdf)
+        mses = [mse(self.points, self.sdf, sdf) for sdf in other_sdfs]
 
-        if (len(left_sdfs) > 0): # don't make a child node if there's nothing to put in it
-            self.left = VPTree(self.points, left_sdfs, self.neutral)
-            self.left.split()
-
-        if (len(right_sdfs) > 0): # don't make a child node if there's nothing to put in it
-            self.right = VPTree(self.points, right_sdfs, self.neutral)
-            self.right.split()
-
-        self.chosen_sdf = self.sdfs[median_index]
-        self.difference = median_mse
-
-
-    def report(self):
-        print("Difference is: ", self.difference)
-        print("ID is: ", self.chosen_sdf.ID)
-
+        order = sorted(range(len(other_sdfs)), key=lambda i: mses[i])
+        median = len(order) // 2
+        self.threshold = mses[order[median]]
 
         lower_sdfs = [other_sdfs[i] for i in order[:median]]
         upper_sdfs = [other_sdfs[i] for i in order[median:]]
