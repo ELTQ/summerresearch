@@ -16,3 +16,8 @@ class SDF:
         for x, y in points:
             total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
         return (total / len(points))
+    
+    def report(self):
+        #print("Function is, " + self.func.__name__ + "()")
+        #print("Midpoint is, ", self.midpoint[0], ", ",  self.midpoint[1] )
+        return (self.func.__name__ + "() at ", "(", self.midpoint[0], "," , self.midpoint[1], ")")
