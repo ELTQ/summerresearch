@@ -1,3 +1,4 @@
+import heapq
 # VPTree implementation for SDFs
 
 # calculate mean squared error between two SDFs over a set of points
@@ -15,8 +16,8 @@ class VPTree:
         self.sdfs = sdfs
         self.sdf = None
         self.threshold = 0.0
-        self.left = None
-        self.right = None
+        self.near = None
+        self.far = None
 
     def split(self):
         sdfs = self.sdfs
@@ -39,46 +40,40 @@ class VPTree:
         upper_sdfs = [other_sdfs[i] for i in order[median:]]
 
         if lower_sdfs:
-            self.left = VPTree(self.points, lower_sdfs)
-            self.left.split()
+            self.near = VPTree(self.points, lower_sdfs)
+            self.near.split()
         if upper_sdfs:
-            self.right = VPTree(self.points, upper_sdfs)
-            self.right.split()
+            self.far = VPTree(self.points, upper_sdfs)
+            self.far.split()
 
-    def report():
-        print("Value: ")
-
-    def depth(self):
-        if (self.left == None) and (self.right == None):
-            return 1
-        elif (self.left == None) and (self.right != None): 
-            return self.right.depth() + 1
-        elif (self.left != None) and (self.right == None):
-            return self.left.depth() + 1
-        else:
-            return max(self.left.depth(), self.right.depth()) + 1
-#search for the k nearest neighbors of a given SDF in the VPTree
+# search for the k nearest neighbors of a given SDF in the VPTree
     def searchkNN(self, target_sdf, k):
-        
+        # base case: if the current node is empty, return an empty list
         if self.sdf is None:
             return []
         dist = mse(self.points, self.sdf, target_sdf)
-        neighbors = [(dist, self.sdf)]
+        neighbors = []
+        heapq.heapify_max(neighbors)
+        heapq.heappush_max(neighbors, (dist, self.sdf))
 
         if dist < self.threshold:
-            if self.left is not None:
-                neighbors += self.left.searchkNN(target_sdf, k)
-                neighbors.sort(key=lambda x: x[0])
-                neighbors = neighbors[:k]
-            if self.right is not None and (len(neighbors) < k or dist + neighbors[-1][0] >= self.threshold):
-                neighbors += self.right.searchkNN(target_sdf, k)
+            if self.near is not None:
+                neighbors.extend(self.near.searchkNN(target_sdf, k))
+                heapq.heapify_max(neighbors)
+                while len(neighbors) > k:
+                    heapq.heappop_max(neighbors)
+            if self.far is not None and (len(neighbors) < k or dist + neighbors[-1][0] >= self.threshold):
+                neighbors.extend(self.far.searchkNN(target_sdf, k))
 
         if dist >= self.threshold:
-            if self.right is not None:
-                neighbors += self.right.searchkNN(target_sdf, k)
-                neighbors.sort(key=lambda x: x[0])
-                neighbors = neighbors[:k]
-            if self.left is not None and (len(neighbors) < k or dist - neighbors[-1][0] <= self.threshold):
-                neighbors += self.left.searchkNN(target_sdf, k)
-        neighbors.sort(key=lambda x: x[0])
-        return neighbors[:k]
+            if self.far is not None:
+                neighbors.extend(self.near.searchkNN(target_sdf, k))
+                heapq.heapify_max(neighbors)
+                while len(neighbors) > k:
+                    heapq.heappop_max(neighbors)
+            if self.near is not None and (len(neighbors) < k or dist - neighbors[-1][0] <= self.threshold):
+                neighbors.extend(self.near.searchkNN(target_sdf, k))
+        heapq.heapify_max(neighbors)
+        while len(neighbors) > k:
+                    heapq.heappop_max(neighbors)
+        return neighbors
