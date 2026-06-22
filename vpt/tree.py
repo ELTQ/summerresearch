@@ -46,4 +46,27 @@ class VPTree:
             self.right.split()
 
 #search for the k nearest neighbors of a given SDF in the VPTree
-    #def search(self, target_sdf, k=1):
+    def searchkNN(self, target_sdf, k):
+        
+        if self.sdf is None:
+            return []
+        dist = mse(self.points, self.sdf, target_sdf)
+        neighbors = [(dist, self.sdf)]
+
+        if dist < self.threshold:
+            if self.left is not None:
+                neighbors += self.left.searchkNN(target_sdf, k)
+                neighbors.sort(key=lambda x: x[0])
+                neighbors = neighbors[:k]
+            if self.right is not None and (len(neighbors) < k or dist + neighbors[-1][0] >= self.threshold):
+                neighbors += self.right.searchkNN(target_sdf, k)
+
+        if dist >= self.threshold:
+            if self.right is not None:
+                neighbors += self.right.searchkNN(target_sdf, k)
+                neighbors.sort(key=lambda x: x[0])
+                neighbors = neighbors[:k]
+            if self.left is not None and (len(neighbors) < k or dist - neighbors[-1][0] <= self.threshold):
+                neighbors += self.left.searchkNN(target_sdf, k)
+        neighbors.sort(key=lambda x: x[0])
+        return neighbors[:k]
