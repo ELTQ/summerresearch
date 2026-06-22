@@ -15,19 +15,19 @@ class VPTree:
         self.points = points
         self.sdfs = sdfs
         self.sdf = None
-        self.threshold = 0.0
-        self.near = None
-        self.far = None
+        self.threshold = -1 # needs to be minus one if not assigned
+        self.left = None
+        self.right = None
 
     def split(self):
         sdfs = self.sdfs
         self.sdfs = None
         if not sdfs:
             return
-        
         self.sdf = sdfs[0]  # choose the first SDF as the pivot
         other_sdfs = sdfs[1:]
         if not other_sdfs:
+            self.threshold = 0
             return
         
         mses = [mse(self.points, self.sdf, sdf) for sdf in other_sdfs]

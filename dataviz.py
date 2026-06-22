@@ -11,7 +11,7 @@ def connectToTree(gr, tree):
     cur_node = tree
     near_child = tree.left
     far_child = tree.right
-    if (near_child and near_child.threshold != 0 ):
+    if (near_child and near_child.threshold != -1 ):
         
         gr.add_edge(cur_node.sdf.report(), near_child.sdf.report())
         '''
@@ -20,7 +20,7 @@ def connectToTree(gr, tree):
         print("near_child =  ", near_child.threshold)
 '''
         gr = connectToTree(gr, near_child)
-    if (far_child and far_child.threshold != 0 ):
+    if (far_child and far_child.threshold != -1 ):
         
         gr.add_edge(cur_node.sdf.report(), far_child.sdf.report())
         '''
@@ -38,8 +38,8 @@ pointy = []
 points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
 
 circs = generate_circles(100)
+print(len(circs))
 
-ucirc = SDF(func=SDF.circle, cx=0, cy=0)
 
 tree = VPTree(points, circs)
 tree.split()
