@@ -37,11 +37,14 @@ pointx = []
 pointy = []
 points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
 
-circs = generate_circles(100)
-print(len(circs))
+shapes = generate_circles(50)
+tris = generate_triangles(50)
 
+shapes.append( sdfs.SDF(sdfs.SDF.circle, 10000000000, 100000000))
 
-tree = VPTree(points, circs)
+shapes += (tris)
+
+tree = VPTree(points, shapes)
 tree.split()
 near_branch = tree.left
 far_branch = tree.right
