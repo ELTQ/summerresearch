@@ -45,6 +45,18 @@ class VPTree:
             self.right = VPTree(self.points, upper_sdfs)
             self.right.split()
 
+    def report():
+        print("Value: ")
+
+    def depth(self):
+        if (self.left == None) and (self.right == None):
+            return 1
+        elif (self.left == None) and (self.right != None): 
+            return self.right.depth() + 1
+        elif (self.left != None) and (self.right == None):
+            return self.left.depth() + 1
+        else:
+            return max(self.left.depth(), self.right.depth()) + 1
 #search for the k nearest neighbors of a given SDF in the VPTree
     def searchkNN(self, target_sdf, k):
         
