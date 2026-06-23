@@ -11,24 +11,29 @@ def mse(points, sdf1, sdf2):
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
     
-    def __init__(self, points, sdfs):
+    def __init__(self, points, sdfs, leaf_size=1):
         self.points = points
         self.sdfs = sdfs
+        self.leaf_size = leaf_size
+        self.leaf = None
         self.sdf = None
-        self.threshold = -1 # needs to be minus one if not assigned
-        self.left = None
-        self.right = None
+        self.threshold = 0.0
+        self.near = None
+        self.far = None
+
 
     def split(self):
         sdfs = self.sdfs
         self.sdfs = None
         if not sdfs:
             return
+        
+        if len(sdfs) <= self.leaf_size:
+            self.leaf = sdfs
+            return
+        
         self.sdf = sdfs[0]  # choose the first SDF as the pivot
         other_sdfs = sdfs[1:]
-        if not other_sdfs:
-            self.threshold = 0
-            return
         
         mses = [mse(self.points, self.sdf, sdf) for sdf in other_sdfs]
 
@@ -40,17 +45,23 @@ class VPTree:
         upper_sdfs = [other_sdfs[i] for i in order[median:]]
 
         if lower_sdfs:
-            self.near = VPTree(self.points, lower_sdfs)
+            self.near = VPTree(self.points, lower_sdfs, self.leaf_size)
             self.near.split()
         if upper_sdfs:
-            self.far = VPTree(self.points, upper_sdfs)
+            self.far = VPTree(self.points, upper_sdfs, self.leaf_size)
             self.far.split()
 
 # search for the k nearest neighbors of a given SDF in the VPTree
     def searchkNN(self, target_sdf, k):
-        # base case: if the current node is empty, return an empty list
-        if self.sdf is None:
-            return []
+        # base case1: if the current node is a leaf, return the k nearest neighbors from the leaf
+        if self.leaf is not None:
+            neighbors = []
+            for sdf in self.leaf:
+                dist = mse(self.points, sdf, target_sdf)
+                heapq.heappush_max(neighbors, (dist, sdf))
+            while len(neighbors) > k:
+                heapq.heappop_max(neighbors)
+            return neighbors
         dist = mse(self.points, self.sdf, target_sdf)
         neighbors = []
         heapq.heapify_max(neighbors)
@@ -62,16 +73,16 @@ class VPTree:
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.far is not None and (len(neighbors) < k or dist + neighbors[-1][0] >= self.threshold):
+            if self.far is not None and (len(neighbors) < k or dist + neighbors[0][0] >= self.threshold):
                 neighbors.extend(self.far.searchkNN(target_sdf, k))
 
         if dist >= self.threshold:
             if self.far is not None:
-                neighbors.extend(self.near.searchkNN(target_sdf, k))
+                neighbors.extend(self.far.searchkNN(target_sdf, k))
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.near is not None and (len(neighbors) < k or dist - neighbors[-1][0] <= self.threshold):
+            if self.near is not None and (len(neighbors) < k or dist - neighbors[0][0] <= self.threshold):
                 neighbors.extend(self.near.searchkNN(target_sdf, k))
         heapq.heapify_max(neighbors)
         while len(neighbors) > k:
