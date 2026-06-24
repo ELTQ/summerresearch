@@ -30,6 +30,7 @@ class VPTree:
         
         if len(sdfs) <= self.leaf_size:
             self.leaf = sdfs
+            self.threshold = 0 # just need something here
             return
         
         self.sdf = sdfs[0]  # choose the first SDF as the pivot

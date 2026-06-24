@@ -11,18 +11,23 @@ def connectToTree(gr, tree):
     cur_node = tree
     near_child = tree.near
     far_child = tree.far
+ 
+    
     if (near_child and near_child.threshold != -1 ):
+        if near_child.leaf:
+            for leafling in near_child.leaf:
+                gr.add_edge(cur_node.sdf.report(), leafling.report())
+        else:
+            gr.add_edge(cur_node.sdf.report(), near_child.sdf.report())
         
-        gr.add_edge(cur_node.sdf.report(), near_child.sdf.report())
-        '''
-        print("adding left child at depth", tree.depth())
-        print("cur_node =  ", cur_node.threshold)
-        print("near_child =  ", near_child.threshold)
-'''
         gr = connectToTree(gr, near_child)
-    if (far_child and far_child.threshold != -1 ):
         
-        gr.add_edge(cur_node.sdf.report(), far_child.sdf.report())
+    if (far_child and far_child.threshold != -1 ):
+        if far_child.leaf:
+            for leafling in far_child.leaf:
+                gr.add_edge(cur_node.sdf.report(), leafling.report())
+        else:
+            gr.add_edge(cur_node.sdf.report(), far_child.sdf.report())
         '''
         print("adding right child at depth", tree.depth())
         print("cur_node =  ", cur_node.threshold)
@@ -56,17 +61,30 @@ gr.add_edge(tree.sdf.report(), near_branch.sdf.report())
 gr.add_edge(tree.sdf.report(), far_branch.sdf.report())
 print(gr)
 
-target = generate_circles(1)
-nearest_target = tree.searchkNN(target[0], 5)
+target = generate_circles(1)[0]
+print("target is", target)
+nearest_hits = [0] * 5
+full_result_knn = tree.searchkNN(target, 5)
 
+print("Ranking of nearest points:")
+for i in range (len(nearest_hits)):
+    nearest_hits[i] = full_result_knn[i][1].report()
+    print(i, ": ", nearest_hits[i])
 
-print(target[0])
-for i in nearest_target:
-    print(i[1])
 
 # add all other nodes
 gr = connectToTree(gr, tree)
 print(gr)
 pos = graphviz_layout(gr, prog="twopi")
-nx.draw_networkx(gr, pos)
+
+## adapted from
+## https://stackoverflow.com/questions/27030473/how-to-set-colors-for-nodes-in-networkx
+colors = []
+for node in gr:
+    if (node in nearest_hits):
+        colors.append("red")
+    else:
+        colors.append("green")
+
+nx.draw_networkx(gr, node_color=colors, pos=pos)
 plt.show()
