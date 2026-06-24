@@ -6,6 +6,13 @@ import numpy
 class SDF:
     def __init__(self, func, cx, cy ): 
         self.func = func
+        self.name = "null"
+
+        if self.func == SDF.circle:
+            self.name = "Circle"
+        elif self.func == SDF.triangle:
+            self.name = "Triangle"
+
         self.midpoint = (cx, cy)
 
     def circle(self, x, y, r = 1.0):
@@ -35,6 +42,7 @@ class SDF:
         return (total / len(points))
     
     def report(self):
-        #print("Function is, " + self.func.__name__ + "()")
-        #print("Midpoint is, ", self.midpoint[0], ", ",  self.midpoint[1] )
-        return (self.func.__name__ + "() at ", "(", self.midpoint[0], "," , self.midpoint[1], ")")
+        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+        
+    def __str__(self):
+        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))

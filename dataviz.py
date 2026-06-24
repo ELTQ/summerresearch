@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 
 def connectToTree(gr, tree):
     cur_node = tree
-    near_child = tree.left
-    far_child = tree.right
+    near_child = tree.near
+    far_child = tree.far
     if (near_child and near_child.threshold != -1 ):
         
         gr.add_edge(cur_node.sdf.report(), near_child.sdf.report())
@@ -46,8 +46,8 @@ shapes += (tris)
 
 tree = VPTree(points, shapes)
 tree.split()
-near_branch = tree.left
-far_branch = tree.right
+near_branch = tree.near
+far_branch = tree.far
 gr = nx.DiGraph()
 
 # initialize root node
@@ -55,6 +55,14 @@ gr.add_node(tree.sdf.report())
 gr.add_edge(tree.sdf.report(), near_branch.sdf.report())
 gr.add_edge(tree.sdf.report(), far_branch.sdf.report())
 print(gr)
+
+target = generate_circles(1)
+nearest_target = tree.searchkNN(target[0], 5)
+
+
+print(target[0])
+for i in nearest_target:
+    print(i[1])
 
 # add all other nodes
 gr = connectToTree(gr, tree)

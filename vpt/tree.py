@@ -17,7 +17,7 @@ class VPTree:
         self.leaf_size = leaf_size
         self.leaf = None
         self.sdf = None
-        self.threshold = 0.0
+        self.threshold = -1
         self.near = None
         self.far = None
 
