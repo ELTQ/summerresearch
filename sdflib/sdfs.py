@@ -46,3 +46,19 @@ class SDF:
         
     def __str__(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+    
+    # this might be a bad idea, but if two SDFs are ever compared to one another using <, >, =, etc. just return true for anything with equals and false for anything with lt/gt
+    def __eq__(self, other):
+        return 1
+    
+    def __lt__(self, other):
+        return 0
+    
+    def __le__(self, other):
+        return 1
+    
+    def __gt__(self, other):
+        return 0
+    
+    def __ge__(self, other):
+        return 1
