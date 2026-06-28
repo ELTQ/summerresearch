@@ -15,7 +15,6 @@ Returns:
 '''
 
 def generate_circles(count):
-
     circles = [0] * count
     for i in range(count): 
         x_coord = random.randint(MIN_COORD, MAX_COORD) # midpoint of circle
