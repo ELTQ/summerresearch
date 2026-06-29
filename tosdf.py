@@ -1,4 +1,5 @@
-import scipy.ndimage
+import scipy
+#from mpeg7 import *
 import numpy as np
 import cv2
 import os
@@ -11,6 +12,7 @@ mpeg7_data = 'C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7'
 # folder storing mpeg7 nparray
 mpeg7_arrs = "C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7_arrs"
 
+mpeg7_sdfs = "/Users/drew/summerresearch/original_sdfs"
 
 # turning mpeg7 data into nparray
 def mpeg7_to_nparray(image):

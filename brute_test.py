@@ -7,6 +7,10 @@ import random
 FIND_NEARBY = 10
 RUNS = 100
 count = 0
+right = 0
+wrong = 0
+first_pos_error_knn = 0
+first_pos_error_brute = 0
 
 for loop in range(RUNS):
     # Main
@@ -29,7 +33,7 @@ for loop in range(RUNS):
     full_result_knn = tree.searchkNN(target, FIND_NEARBY)
     nearest_hits = [0] * FIND_NEARBY
     for i in range (len(nearest_hits)):
-        nearest_hits[i] = full_result_knn[i][1].report()
+        nearest_hits[i] = full_result_knn[i][2].report()
 
     # using the brute force method
     brute_max = []
@@ -39,6 +43,7 @@ for loop in range(RUNS):
             tuple_i = ( mse(points, my_shape, target), my_shape )
             heapq.heappush_max(brute_max, tuple_i)
         else: # if there are enough nodes in our max heap
+            heapq.heapify_max(brute_max)
             root = heapq.heappop_max(brute_max)
             if (root[0] > mse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
                 heapq.heappush_max(brute_max, (mse(points, my_shape, target), my_shape)) # add it to the heap
@@ -47,6 +52,7 @@ for loop in range(RUNS):
 
     brute_hits = [0] * FIND_NEARBY
     for i in range (len(brute_hits)):
+        heapq.heapify_max(brute_max)
         brute_hits[i] = heapq.heappop_max(brute_max)[1].report()
 
 
@@ -54,15 +60,37 @@ for loop in range(RUNS):
     # https://stackoverflow.com/questions/1388818/how-can-i-compare-two-lists-in-python-and-return-matches
     if len(set(brute_hits) & set(nearest_hits)) == FIND_NEARBY: # comparing the actual descriptions, as the references to the SDFs may have changed at this point
         #print("good job!")
-        count += 1
+        right += 1
     else:
-        print(set(nearest_hits).difference(set(brute_hits)), "was only in the KNN method")
-        print(set(brute_hits).difference(set(nearest_hits)), "was only in the Brute method")
-        pass
+        print("FAILURE at iteration ", loop)
+        wrong += 1
+        unique_knn = list(set(nearest_hits).difference(set(brute_hits)))
+        unique_brute = list(set(brute_hits).difference(set(nearest_hits)))
+          
+        print(unique_knn, "was only in the KNN method")
+        print(unique_brute, "was only in the Brute method")
+        print("all knn hits: ")
+        for hit in nearest_hits:
+            print(hit)
+        print("all brute hits: ")
+        for hit in brute_hits:
+            print(hit)
+        print("points: ")
+        print(points)
+        print("target: ")
+        print(target)
+        print("\n")
+        if unique_knn[0] == nearest_hits[0]:
+            first_pos_error_knn += 1
+        if unique_brute[0] == brute_hits[0]:
+            first_pos_error_brute += 1
+            
 
 
 
 if count == RUNS:
     print("all tests passed!")
 else:
-    print("some tests failed.... count = ", count)
+    print(right / RUNS, "of runs passed successfully.")
+    print("Of the runs that failed, the first position of the KNN list was wrong ", first_pos_error_knn / wrong, "%% of the time.")
+    print("Of the runs that failed, the first position of the brute list was wrong ", first_pos_error_brute / wrong, "%% of the time.")

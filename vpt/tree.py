@@ -33,10 +33,10 @@ class VPTree:
     def split(self):
         sdfs = self.sdfs
         self.sdfs = None
-        if not sdfs:
+        if not sdfs: # if nothing is inside our list of SDFs, we can't split the tree
             return
         
-        if len(sdfs) <= self.leaf_size:
+        if len(sdfs) <= self.leaf_size: # if our chosen leaf size is greater than or equal to the number of sdfs we have, put them into a leaf node
             self.leaf = sdfs
             self.threshold = 0 # just need something here
             return
@@ -50,12 +50,12 @@ class VPTree:
         median = len(order) // 2
         self.threshold = l2norms[order[median]]
 
-        lower_sdfs = [other_sdfs[i] for i in order[:median]]
-        upper_sdfs = [other_sdfs[i] for i in order[median:]]
+        lower_sdfs = [other_sdfs[i] for i in order[:median]] # values less than the median, sdfs that should be in the "near" half
+        upper_sdfs = [other_sdfs[i] for i in order[median:]] # values greater than or equal to the median, sdfs that should be in the "far" half (threshold goes far too)
 
-        if lower_sdfs:
+        if lower_sdfs: # if there are any MSEs less than the median
             self.near = VPTree(self.points, lower_sdfs, self.leaf_size)
-            self.near.split()
+            self.near.split() # run this recursively to create a full tree
         if upper_sdfs:
             self.far = VPTree(self.points, upper_sdfs, self.leaf_size)
             self.far.split()
@@ -69,7 +69,7 @@ class VPTree:
                 dist = l2norm(self.points, sdf, target_sdf)
                 heapq.heappush_max(neighbors, (dist, sdf.name, sdf))
             while len(neighbors) > k:
-                heapq.heappop_max(neighbors)
+                heapq.heappop_max(neighbors) # presumably gets rid of the furthest away nodes
             return neighbors
         dist = l2norm(self.points, self.sdf, target_sdf)
 
@@ -83,7 +83,7 @@ class VPTree:
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.far is not None and (len(neighbors) < k or dist + neighbors[0][0] >= self.threshold):
+            if self.far is not None and (len(neighbors) < k or (dist + neighbors[0][0]) >= self.threshold): # should we be looking if less than or equal to threshold?
                 neighbors.extend(self.far.searchkNN(target_sdf, k))
 
         if dist >= self.threshold:
@@ -92,8 +92,9 @@ class VPTree:
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.near is not None and (len(neighbors) < k or dist - neighbors[0][0] <= self.threshold):
+            if self.near is not None and (len(neighbors) < k or ( dist - neighbors[0][0]) <= self.threshold): # removing the less than or equals to
                 neighbors.extend(self.near.searchkNN(target_sdf, k))
+
         heapq.heapify_max(neighbors)
         while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
