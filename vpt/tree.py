@@ -5,7 +5,7 @@ import heapq
 def mse(points, sdf1, sdf2):
     total = 0
     for x, y in points:
-        total += (sdf1.func(sdf1, x, y) - sdf2.func(sdf2, x, y)) ** 2
+        total += (sdf1((x, y)) - sdf2((x, y))) ** 2
     return (total / len(points))
 
 # VPTree class for organizing SDFs based on their similarity
@@ -59,14 +59,14 @@ class VPTree:
             neighbors = []
             for sdf in self.leaf:
                 dist = mse(self.points, sdf, target_sdf)
-                heapq.heappush_max(neighbors, (dist, sdf))
+                heapq.heappush_max(neighbors, (dist, sdf.name, sdf))
             while len(neighbors) > k:
                 heapq.heappop_max(neighbors)
             return neighbors
         dist = mse(self.points, self.sdf, target_sdf)
         neighbors = []
         heapq.heapify_max(neighbors)
-        heapq.heappush_max(neighbors, (dist, self.sdf))
+        heapq.heappush_max(neighbors, (dist, self.sdf.name, self.sdf))
 
         if dist < self.threshold:
             if self.near is not None:
