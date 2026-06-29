@@ -1,31 +1,23 @@
+import os
+import numpy as np
 from sdflib.sdfs import * 
-from sdflib.generate_sdfs import *
 import random
 import vpt.tree as tree
 from vpt.tree import VPTree, mse
 
+from tosdf import *
 
+mpeg7_arrs = "C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7_arrs"
+shapes = sdf_load(mpeg7_arrs)
 pointx = []
 pointy = []
-points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
+points = []
 
-circs = generate_circles(100)
+for i in range(100):
+    points.append((random.randint(0, 255), random.randint(0, 255)))
 
-ucirc = SDF(func=SDF.circle, cx=0, cy=0)
-
-tree = VPTree(points, circs, ucirc)
+apple1 = shapes[0]
+tree = VPTree(points, shapes[1:])
 tree.split()
-left_branch = tree.left
-right_branch = tree.right 
 
-tree.report()
-tree.left.report()
-tree.right.report()
-if left_branch.left:
-    left_branch.left.report()
-if left_branch.right:
-    left_branch.right.report()   
-if right_branch.left:
-    right_branch.left.report()
-if right_branch.right:
-    right_branch.right.report()
+print("the nearest neighbor of circf is", tree.searchkNN(apple1, 10))
