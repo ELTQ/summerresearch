@@ -4,7 +4,7 @@ import cv2
 import os
 from PIL import Image
 import scipy.interpolate
-
+import scipy.ndimage
 # folder storing mpe7 data
 mpeg7_data = 'C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7'
 
@@ -43,5 +43,7 @@ def sdf_load(arr_data):
     sdfs = []
     for arr in os.listdir(arr_data):
         array = np.load(os.path.join(mpeg7_arrs, arr))
-        sdfs += nparray_to_sdfs(array)
+        sdf = nparray_to_sdfs(array)
+        sdf.name = arr.split('.')[0]
+        sdfs.append(sdf)
     return sdfs
