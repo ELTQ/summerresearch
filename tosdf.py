@@ -7,12 +7,12 @@ from PIL import Image
 import scipy.interpolate
 import scipy.ndimage
 # folder storing mpe7 data
-mpeg7_data = 'C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7'
+mpeg7_data = '/Users/drew/summerresearch/original'
 
 # folder storing mpeg7 nparray
-mpeg7_arrs = "C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7_arrs"
+mpeg7_arrs = "/Users/drew/summerresearch/original_sdfs"
 
-mpeg7_sdfs = "/Users/drew/summerresearch/original_sdfs"
+mpeg7_sdfs = "/Users/drew/summerresearch/original_converts"
 
 # turning mpeg7 data into nparray
 def mpeg7_to_nparray(image):

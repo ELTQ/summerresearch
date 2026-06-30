@@ -7,7 +7,7 @@ from vpt.tree import VPTree, mse
 
 from tosdf import *
 
-mpeg7_arrs = "C:\\Users\\qiuel\\summerresearch\\part1\\mpeg7_arrs"
+mpeg7_arrs = "/Users/drew/summerresearch/original_sdfs"
 shapes = sdf_load(mpeg7_arrs)
 pointx = []
 pointy = []
