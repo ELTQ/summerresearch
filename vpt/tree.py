@@ -13,7 +13,7 @@ def rmse(points, sdf1, sdf2):
 def l2norm(points, sdf1, sdf2):
     total = 0
     for x, y in points:
-        total += (sdf1((x, y)) - sdf2((x, y))) ** 2
+        total += (sdf1.func(sdf1, x, y) - sdf2.func(sdf2, x, y)) ** 2
     return total ** 0.5
 
 # VPTree class for organizing SDFs based on their similarity
