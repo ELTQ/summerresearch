@@ -3,7 +3,7 @@ import numpy as np
 from sdflib.sdfs import * 
 import random
 import vpt.tree as tree
-from vpt.tree import VPTree, mse
+from vpt.tree import VPTree, rmse
 
 from tosdf import *
 
@@ -19,5 +19,7 @@ for i in range(100):
 apple1 = shapes[0]
 tree = VPTree(points, shapes[1:])
 tree.split()
+
+print("target is", apple1.name)
 
 print("the nearest neighbor of circf is", tree.searchkNN(apple1, 10))

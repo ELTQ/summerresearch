@@ -40,13 +40,13 @@ for loop in range(RUNS):
     heapq.heapify_max(brute_max) # is this necessary on an empty list? 
     for my_shape in shapes:
         if len(brute_max) < FIND_NEARBY: # if we haven't found enough nearby yet
-            tuple_i = ( mse(points, my_shape, target), my_shape )
+            tuple_i = ( rmse(points, my_shape, target), my_shape )
             heapq.heappush_max(brute_max, tuple_i)
         else: # if there are enough nodes in our max heap
             heapq.heapify_max(brute_max)
             root = heapq.heappop_max(brute_max)
-            if (root[0] > mse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
-                heapq.heappush_max(brute_max, (mse(points, my_shape, target), my_shape)) # add it to the heap
+            if (root[0] > rmse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
+                heapq.heappush_max(brute_max, (rmse(points, my_shape, target), my_shape)) # add it to the heap
             else:
                 heapq.heappush_max(brute_max, root) # otherwise, put the root back on top
 
@@ -59,7 +59,7 @@ for loop in range(RUNS):
     # code derived from 
     # https://stackoverflow.com/questions/1388818/how-can-i-compare-two-lists-in-python-and-return-matches
     if len(set(brute_hits) & set(nearest_hits)) == FIND_NEARBY: # comparing the actual descriptions, as the references to the SDFs may have changed at this point
-        #print("good job!")
+        print("good job!")
         right += 1
     else:
         print("FAILURE at iteration ", loop)
@@ -86,11 +86,10 @@ for loop in range(RUNS):
             first_pos_error_brute += 1
             
 
-
-
-if count == RUNS:
+if right == RUNS:
     print("all tests passed!")
 else:
+    print(wrong)
     print(right / RUNS, "of runs passed successfully.")
-    print("Of the runs that failed, the first position of the KNN list was wrong ", first_pos_error_knn / wrong, "%% of the time.")
-    print("Of the runs that failed, the first position of the brute list was wrong ", first_pos_error_brute / wrong, "%% of the time.")
+    print("Of the runs that failed, the first position of the KNN list was wrong ", first_pos_error_knn )
+    print("Of the runs that failed, the first position of the brute list was wrong ", first_pos_error_brute )

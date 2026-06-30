@@ -44,8 +44,10 @@ def nparray_to_sdfs(sdf_array):
 def sdf_load(arr_data):
     sdfs = []
     for arr in os.listdir(arr_data):
-        array = np.load(os.path.join(mpeg7_arrs, arr))
-        sdf = nparray_to_sdfs(array)
-        sdf.name = arr.split('.')[0]
-        sdfs.append(sdf)
+        filename = os.path.join(mpeg7_arrs, arr)
+        if filename[-4:] == ".npy":
+            array = np.load(filename, allow_pickle=True)
+            sdf = nparray_to_sdfs(array)
+            sdf.name = arr.split('.')[0]
+            sdfs.append(sdf)
     return sdfs

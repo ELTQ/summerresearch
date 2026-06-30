@@ -62,8 +62,8 @@ for loop in range(RUNS):
     furthest_sdf = nearest_hits[0]
 
     for sdf in (nearest_hits):
-        if (mse(points, target, sdf) > max):
-            max = mse(points, target, sdf)
+        if (rmse(points, target, sdf) > max):
+            max = rmse(points, target, sdf)
             furthest_sdf = sdf
     
     radius = furthest_sdf
