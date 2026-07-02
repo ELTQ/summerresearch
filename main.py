@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 
 
 '''
-mpeg7_imgs = "C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets"
+mpeg7_imgs = "/Users/drew/summerresearch/keys_and_pockets"
 
-mimg = Image.open("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_pocket.gif")
+mimg = Image.open("/Users/drew/summerresearch/keys_and_pockets/mickey_pocket.gif")
 
 shapes = []
 for img in os.listdir(mpeg7_imgs):

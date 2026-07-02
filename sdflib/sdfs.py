@@ -11,6 +11,11 @@ import math
 class SDF:
     def __init__(self): 
         self.name = "null"
+        self.midpoint = (0, 0)
+
+    def __str__(self):
+        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+
 
 class circle(SDF):
     def __init__(self, cx, cy):
@@ -79,5 +84,3 @@ def compare(self, other, points):
     
 
         
-def __str__(self):
-    return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
