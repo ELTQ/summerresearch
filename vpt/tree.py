@@ -6,15 +6,14 @@ import numpy as np
 def rmse(points, sdf1, sdf2):
     total = 0
     for x, y in points:
-        total += (sdf1.func(sdf1, x, y) - sdf2.func(sdf2, x, y)) ** 2
+        total += (sdf1(x, y) - sdf2(x, y)) ** 2
     return (total / len(points)) ** 0.5
 
 # Calculate the L2 norm between two SDFs over a set of points 
+# change L2 norm into actual integral
 def l2norm(points, sdf1, sdf2):
-    total = 0
-    for x, y in points:
-        total += (sdf1.func(sdf1, x, y) - sdf2.func(sdf2, x, y)) ** 2
-    return total ** 0.5
+    diff = np.array([sdf1(x, y) - sdf2(x, y) for x, y in points])
+    return np.linalg.norm(diff)
 
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
@@ -33,10 +32,10 @@ class VPTree:
     def split(self):
         sdfs = self.sdfs
         self.sdfs = None
-        if not sdfs: # if nothing is inside our list of SDFs, we can't split the tree
+        if not sdfs:
             return
         
-        if len(sdfs) <= self.leaf_size: # if our chosen leaf size is greater than or equal to the number of sdfs we have, put them into a leaf node
+        if len(sdfs) <= self.leaf_size:
             self.leaf = sdfs
             self.threshold = 0 # just need something here
             return
@@ -50,12 +49,12 @@ class VPTree:
         median = len(order) // 2
         self.threshold = l2norms[order[median]]
 
-        lower_sdfs = [other_sdfs[i] for i in order[:median]] # values less than the median, sdfs that should be in the "near" half
-        upper_sdfs = [other_sdfs[i] for i in order[median:]] # values greater than or equal to the median, sdfs that should be in the "far" half (threshold goes far too)
+        lower_sdfs = [other_sdfs[i] for i in order[:median]]
+        upper_sdfs = [other_sdfs[i] for i in order[median:]]
 
-        if lower_sdfs: # if there are any MSEs less than the median
+        if lower_sdfs:
             self.near = VPTree(self.points, lower_sdfs, self.leaf_size)
-            self.near.split() # run this recursively to create a full tree
+            self.near.split()
         if upper_sdfs:
             self.far = VPTree(self.points, upper_sdfs, self.leaf_size)
             self.far.split()
@@ -69,7 +68,7 @@ class VPTree:
                 dist = l2norm(self.points, sdf, target_sdf)
                 heapq.heappush_max(neighbors, (dist, sdf.name, sdf))
             while len(neighbors) > k:
-                heapq.heappop_max(neighbors) # presumably gets rid of the furthest away nodes
+                heapq.heappop_max(neighbors)
             return neighbors
         dist = l2norm(self.points, self.sdf, target_sdf)
 
@@ -83,7 +82,7 @@ class VPTree:
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.far is not None and (len(neighbors) < k or (dist + neighbors[0][0]) >= self.threshold): # should we be looking if less than or equal to threshold?
+            if self.far is not None and (len(neighbors) < k or dist + neighbors[0][0] >= self.threshold):
                 neighbors.extend(self.far.searchkNN(target_sdf, k))
 
         if dist >= self.threshold:
@@ -92,9 +91,8 @@ class VPTree:
                 heapq.heapify_max(neighbors)
                 while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
-            if self.near is not None and (len(neighbors) < k or ( dist - neighbors[0][0]) <= self.threshold): # removing the less than or equals to
+            if self.near is not None and (len(neighbors) < k or dist - neighbors[0][0] <= self.threshold):
                 neighbors.extend(self.near.searchkNN(target_sdf, k))
-
         heapq.heapify_max(neighbors)
         while len(neighbors) > k:
                     heapq.heappop_max(neighbors)
