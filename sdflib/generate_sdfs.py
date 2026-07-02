@@ -20,7 +20,7 @@ def generate_circles(count):
         x_coord = random.randint(MIN_COORD, MAX_COORD) # midpoint of circle
         y_coord = random.randint(MIN_COORD, MAX_COORD)
 
-        circles[i] = sdfs.SDF(sdfs.SDF.circle, x_coord, y_coord)
+        circles[i] = sdfs.circle(x_coord, y_coord)
     return circles
 
 def generate_triangles(count):
@@ -29,7 +29,7 @@ def generate_triangles(count):
     for i in range(count): 
         x_coord = random.randint(MIN_COORD, MAX_COORD) # midpoint of triangle
         y_coord = random.randint(MIN_COORD, MAX_COORD)
-        triangles[i] = sdfs.SDF(sdfs.SDF.triangle, x_coord, y_coord)
+        triangles[i] = sdfs.triangle(x_coord, y_coord)
     return triangles
 
         

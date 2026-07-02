@@ -10,7 +10,6 @@ import math
 
 class SDF:
     def __init__(self): 
-        
         self.name = "null"
 
 class circle(SDF):
@@ -23,6 +22,9 @@ class circle(SDF):
         cy = self.midpoint[1]
         distance = math.dist((cx, cy), (x, y)) - r
         return distance
+
+    def report(self):
+        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
     
 
 class triangle(SDF):
@@ -42,6 +44,9 @@ class triangle(SDF):
             y = ((-k*x)-y) / 2
         x -= np.clip(x, -2*r, 0)
         return -math.dist((cx, cy), (x, y)) * math.copysign(1, y) # we dont have a sign function so this is what i need to do instead
+
+    def report(self):
+        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
 
 class image(SDF):
     def __init__(self, dir):
@@ -72,8 +77,7 @@ def compare(self, other, points):
         total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
     return (total / len(points))
     
-def report(self):
-    return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+
         
 def __str__(self):
     return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
