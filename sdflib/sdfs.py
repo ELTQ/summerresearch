@@ -1,27 +1,36 @@
 # SDF objects class
-
+import scipy.ndimage
+import numpy as np
+import cv2
+import os
+from PIL import Image
+import scipy.interpolate
+import scipy.ndimage
 import math
-import numpy
 
 class SDF:
-    def __init__(self, func, cx, cy ): 
-        self.func = func
+    def __init__(self): 
+        
         self.name = "null"
 
-        if self.func == SDF.circle:
-            self.name = "Circle"
-        elif self.func == SDF.triangle:
-            self.name = "Triangle"
-
+class circle(SDF):
+    def __init__(self, cx, cy):
+        self.name = "circle"
         self.midpoint = (cx, cy)
 
-    def circle(self, x, y, r = 1.0):
+    def __call__(self, x, y, r = 1.0):
         cx = self.midpoint[0]
         cy = self.midpoint[1]
         distance = math.dist((cx, cy), (x, y)) - r
         return distance
     
-    def triangle(self, x, y, r = 1.0):
+
+class triangle(SDF):
+    def __init__(self, cx, cy):
+        self.name = "triangle"
+        self.midpoint = (cx, cy)
+
+    def __call__(self, x, y, r = 1.0):
         cx = self.midpoint[0]
         cy = self.midpoint[1]
 
@@ -31,34 +40,40 @@ class SDF:
         if (((x + k) * y) > 0):
             x = ((x-k)*y) / 2
             y = ((-k*x)-y) / 2
-        x -= numpy.clip(x, -2*r, 0)
+        x -= np.clip(x, -2*r, 0)
         return -math.dist((cx, cy), (x, y)) * math.copysign(1, y) # we dont have a sign function so this is what i need to do instead
+
+class image(SDF):
+    def __init__(self, dir):
+        self.name = os.path.basename(dir).split('.')[0]
+        img = Image.open(dir)
+        img = img.convert('L')
+        img = img.resize((256, 256))
+        img = np.array(img)
+        inside_dist = scipy.ndimage.distance_transform_edt(img)
+        outside_dist = scipy.ndimage.distance_transform_edt(cv2.bitwise_not(img))
+        sdf_arr = outside_dist - inside_dist
+        shape = sdf_arr.shape
+        xs = np.arange(shape[0])
+        ys = np.arange(shape[1])
+        self.sdf = scipy.interpolate.RegularGridInterpolator((xs, ys), sdf_arr)
     
-    def compare(self, other, points):
-        # compare two SDFs 
-        total = 0
-        for x, y in points:
-            total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
-        return (total / len(points))
+    def __call__(self, x, y):
+        return self.sdf((x, y))
+
+
+
+
+
+def compare(self, other, points):
+    # compare two SDFs 
+    total = 0
+    for x, y in points:
+        total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
+    return (total / len(points))
     
-    def report(self):
-        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+def report(self):
+    return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
         
-    def __str__(self):
-        return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
-    
-    # this might be a bad idea, but if two SDFs are ever compared to one another using <, >, =, etc. just return true for anything with equals and false for anything with lt/gt
-    def __eq__(self, other):
-        return 1
-    
-    def __lt__(self, other):
-        return 0
-    
-    def __le__(self, other):
-        return 1
-    
-    def __gt__(self, other):
-        return 0
-    
-    def __ge__(self, other):
-        return 1
+def __str__(self):
+    return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
