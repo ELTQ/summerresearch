@@ -102,17 +102,17 @@ class VPTree:
 
     # search for the k nearest complements of a given SDF in the VPTree
     def searchkcomp(self, target_sdf, k):
-        flipped_sdf = lambda x, y: -target_sdf(x, y)  # flip the target SDF for complement search
+        inverted_target_sdf = lambda x, y: -target_sdf(x, y)
         # base case1: if the current node is a leaf, return the k nearest complements from the leaf
         if self.leaf is not None:
             comps = []
             for sdf in self.leaf:
-                dist = l2norm(self.points, sdf, flipped_sdf)
+                dist = l2norm(self.points, sdf, inverted_target_sdf)
                 heapq.heappush_max(comps, (dist, sdf.name, sdf))
             while len(comps) > k:
                 heapq.heappop_max(comps)
             return comps
-        dist = l2norm(self.points, self.sdf, flipped_sdf)
+        dist = l2norm(self.points, self.sdf, inverted_target_sdf)
 
         comps = []
         heapq.heappush_max(comps, (dist, self.sdf.name, self.sdf))
@@ -120,21 +120,21 @@ class VPTree:
         # try abosolute value
         if dist < self.threshold:
             if self.near is not None:
-                comps.extend(self.near.searchkcomp(flipped_sdf, k))
+                comps.extend(self.near.searchkcomp(target_sdf, k))
                 heapq.heapify_max(comps)
                 while len(comps) > k:
                     heapq.heappop_max(comps)
             if self.far is not None and (len(comps) < k or dist + comps[0][0] >= self.threshold):
-                comps.extend(self.far.searchkcomp(flipped_sdf, k))
+                comps.extend(self.far.searchkcomp(target_sdf, k))
 
         if dist >= self.threshold:
             if self.far is not None:
-                comps.extend(self.far.searchkcomp(flipped_sdf, k))
+                comps.extend(self.far.searchkcomp(target_sdf, k))
                 heapq.heapify_max(comps)
                 while len(comps) > k:
                     heapq.heappop_max(comps)
             if self.near is not None and (len(comps) < k or dist - comps[0][0] <= self.threshold):
-                comps.extend(self.near.searchkcomp(flipped_sdf, k))
+                comps.extend(self.near.searchkcomp(target_sdf, k))
         heapq.heapify_max(comps)
         while len(comps) > k:
                     heapq.heappop_max(comps)
