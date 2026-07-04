@@ -1,6 +1,4 @@
 import os
-from os import listdir 
-
 import numpy as np
 from sdflib import sdfs
 import random
@@ -9,15 +7,19 @@ from vpt.tree import VPTree, rmse
 import cv2
 from PIL import Image, ImageOps
 import matplotlib.pyplot as plt
-
-
 '''
 
 
 '''
-mpeg7_imgs = "/Users/drew/summerresearch/keys_and_pockets"
+mpeg7_imgs = "C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets"
 
-mimg = Image.open("/Users/drew/summerresearch/keys_and_pockets/mickey_pocket.gif")
+mimg = Image.open("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_inverted.gif")
+"""
+for frame in range(-90, 90, 10):
+    mimg = mimg.rotate(10, expand=False)
+    mimg.save("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_" + str(frame) + ".gif")
+"""
+
 
 shapes = []
 for img in os.listdir(mpeg7_imgs):
@@ -35,22 +37,19 @@ for i in range(1000):
 
 print(len(shapes))
 
-mickey_key = shapes[0]
-
-tree = VPTree(points, shapes[1:])
+for shape in shapes:
+    if shape.name == "mickey_key_inverted":
+        mickey_pocket = shape
+        break
+tree = VPTree(points, shapes[:])
 tree.split()
-print("target is " + mickey_key.name)
+print("target is " + mickey_pocket.name)
 
-print("the nearest complement of circf is", tree.searchkcomp(mickey_key, 7))
+# find the nearest complement to mickey_pocket
+print("the nearest complement is", sorted(tree.searchkcomp(mickey_pocket, 1)))
 
+# changing pixel values to 0 or 255 for visualization
 """
-print(mickey_pocket.name)
-print(mickey_key(128,128), mickey_pocket(128,128))
-print(mickey_key.sdf_arr, -mickey_pocket.sdf_arr)
-#print("the nearest complement of circf is", tree.searchkNN(mickey_key, 1))
-
-mickey_key_array = mickey_key.sdf_arr  
-mickey_pocket_array = mickey_pocket.sdf_arr
 
 for i in range(256):
     for j in range(256):
@@ -74,4 +73,6 @@ plt.show()
 plt.imshow(mickey_pocket_array, cmap='gray', interpolation='nearest')
 plt.colorbar() # Adds a bar showing intensity scale
 plt.show()
+
+
 """
