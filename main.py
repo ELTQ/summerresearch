@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 
 
 '''
-mpeg7_imgs = "C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets"
+mpeg7_imgs = "keys_and_pockets"
 
-mimg = Image.open("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_inverted.gif")
+mimg = Image.open("keys_and_pockets/mickey_key_inverted.gif")
 """
 for frame in range(-90, 90, 10):
     mimg = mimg.rotate(10, expand=False)
@@ -45,9 +45,29 @@ tree = VPTree(points, shapes[:])
 tree.split()
 print("target is " + mickey_pocket.name)
 
-# find the nearest complement to mickey_pocket
-print("the nearest complement is", sorted(tree.searchkcomp(mickey_pocket, 1)))
+others = sorted(tree.searchkcomp(mickey_pocket, 4))
+print(others)
+#quit()
 
+# find the nearest complement to mickey_pocket
+print("the nearest complement is", sorted(others))
+
+DEN = 32
+
+xv, yv = np.meshgrid(np.linspace(0,1,DEN),np.linspace(0,1,DEN))
+coords = np.stack([np.reshape(xv,-1), np.reshape(yv,-1)],1)
+
+
+fig,ax = plt.subplots(1,len(others)+1)
+
+evaluated = mickey_pocket(coords)
+ax[0].matshow(evaluated.reshape(DEN,DEN).T)
+
+for i in range(len(others)):
+    evaluated = others[i][2](coords)
+    ax[i+1].matshow(evaluated.reshape(DEN,DEN).T)
+
+plt.show()
 # changing pixel values to 0 or 255 for visualization
 """
 
