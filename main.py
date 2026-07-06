@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 
 
 '''
-mpeg7_imgs = "keys_and_pockets"
+mpeg7_imgs = "C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets"
 
-mimg = Image.open("keys_and_pockets/mickey_key_inverted.gif")
+mimg = Image.open("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_inverted.gif")
 """
 for frame in range(-90, 90, 10):
     mimg = mimg.rotate(10, expand=False)
@@ -68,31 +68,3 @@ for i in range(len(others)):
     ax[i+1].matshow(evaluated.reshape(DEN,DEN).T)
 
 plt.show()
-# changing pixel values to 0 or 255 for visualization
-"""
-
-for i in range(256):
-    for j in range(256):
-        if mickey_key_array[i][j] < 0:
-            mickey_key_array[i][j] = 0
-        else:
-            mickey_key_array[i][j] = 255
-
-for i in range(256):
-    for j in range(256):
-        if mickey_pocket_array[i][j] < 0:
-            mickey_pocket_array[i][j] = 0
-        else:
-            mickey_pocket_array[i][j] = 255
-
-# Visualize the pixels
-plt.imshow(mickey_key_array, cmap='gray', interpolation='nearest')
-plt.colorbar() # Adds a bar showing intensity scale
-plt.show()
-
-plt.imshow(mickey_pocket_array, cmap='gray', interpolation='nearest')
-plt.colorbar() # Adds a bar showing intensity scale
-plt.show()
-
-
-"""
