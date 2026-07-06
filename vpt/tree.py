@@ -30,8 +30,7 @@ def l2norm3d(sdf1, sdf2):
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
 
-    def __init__(self, points, sdfs, leaf_size=1):
-        self.points = points
+    def __init__(self, sdfs, leaf_size=1):
         self.sdfs = sdfs
         self.leaf_size = leaf_size
         self.leaf = None
@@ -70,10 +69,10 @@ class VPTree:
 
         # recursively create the near and far subtrees
         if lower_sdfs:
-            self.near = VPTree(self.points, lower_sdfs, self.leaf_size)
+            self.near = VPTree(lower_sdfs, self.leaf_size)
             self.near.split()
         if upper_sdfs:
-            self.far = VPTree(self.points, upper_sdfs, self.leaf_size)
+            self.far = VPTree(upper_sdfs, self.leaf_size)
             self.far.split()
 
 # search for the k nearest neighbors of a given SDF in the VPTree
