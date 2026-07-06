@@ -70,8 +70,9 @@ class image(SDF):
     
     def __call__(self, x, y):
         return self.sdf((x, y))
-
-
+    
+    def __str__(self):
+        return (self.name)
 
 
 
