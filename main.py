@@ -28,29 +28,18 @@ for img in os.listdir(mpeg7_imgs):
     shapes.append(sdfs.image(os.path.join(mpeg7_imgs, img)))
 
 
-pointx = []
-pointy = []
-points = []
-
-for i in range(1000):
-    points.append((random.randint(0, 255), random.randint(0, 255)))
-
-print(len(shapes))
-
 for shape in shapes:
     if shape.name == "mickey_key_inverted":
         mickey_pocket = shape
         break
-tree = VPTree(points, shapes[:])
+
+tree = VPTree(shapes[:])
 tree.split()
 print("target is " + mickey_pocket.name)
 
 others = sorted(tree.searchkcomp(mickey_pocket, 4))
-print(others)
-#quit()
 
-# find the nearest complement to mickey_pocket
-print("the nearest complement is", sorted(others))
+print("the k nearest complements are", others)
 
 DEN = 32
 
