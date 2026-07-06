@@ -1,8 +1,8 @@
 import heapq
 import numpy as np
-from scipy.integrate import quad
-from scipy.integrate import dblquad
+from scipy.integrate import quad,dblquad,qmc_quad
 
+from tqdm import tqdm
 
 # VPTree implementation for SDFs
 
@@ -13,15 +13,23 @@ def rmse(points, sdf1, sdf2):
         total += (sdf1(x, y) - sdf2(x, y)) ** 2
     return (total / len(points)) ** 0.5
 
-# Calculate the L2 norm between two SDFs over a set of points 
-def l2norm(sdf1, sdf2, lb=0, ub=255):
-    quad_func = lambda x, y: (sdf1(x, y) - sdf2(x, y)) ** 2
-    integral, error = dblquad(quad_func, lb, ub, lambda x: lb, lambda x: ub)
+# Calculate the L2 norm between two SDFs over a set of points
+def l2norm(sdf1, sdf2):
+    quad_func = lambda x: np.power((sdf1(x.T) - sdf2(x.T)),2.0).reshape(-1)
+    #integral, error = dblquad(quad_func, lb, ub, lambda x: lb, lambda x: ub, epsabs=.1)
+    integral, error = qmc_quad(quad_func, np.zeros(2), np.ones(2), n_points=1e3)
+    print(error)
+    return np.sqrt(integral)
+
+def l2norm3d(sdf1, sdf2):
+    quad_func = lambda x: np.power((sdf1(x.T) - sdf2(x.T)),2.0).reshape(-1)
+    integral, error = qmc_quad(quad_func, np.zeros(3), np.ones(3), n_points=1e3)
+    print(error)
     return np.sqrt(integral)
 
 # VPTree class for organizing SDFs based on their similarity
 class VPTree:
-    
+
     def __init__(self, points, sdfs, leaf_size=1):
         self.points = points
         self.sdfs = sdfs
@@ -47,8 +55,9 @@ class VPTree:
         # choose a pivot SDF and calculate the L2 norms to all other SDFs
         self.sdf = sdfs[0]  # choose the first SDF as the pivot
         other_sdfs = sdfs[1:]
-        
-        l2norms = [l2norm(self.sdf, sdf) for sdf in other_sdfs]
+
+        print(len(other_sdfs))
+        l2norms = [l2norm(self.sdf, sdf) for sdf in tqdm(other_sdfs)]
 
         # sort the other SDFs based on their L2 norms and find the median to set as the threshold
         order = sorted(range(len(other_sdfs)), key=lambda i: l2norms[i])
@@ -108,12 +117,12 @@ class VPTree:
                     heapq.heappop_max(neighbors)
         # return the k nearest neighbors
         return neighbors
-    
+
 
 
     # search for the k nearest complements of a given SDF in the VPTree
     def searchkcomp(self, target_sdf, k):
-        inverted_target_sdf = lambda x, y: -target_sdf(x, y)
+        inverted_target_sdf = lambda arr: -1*target_sdf(arr)
         # base case1: if the current node is a leaf, return the k nearest complements from the leaf
         if self.leaf is not None:
             comps = []
@@ -123,7 +132,7 @@ class VPTree:
             while len(comps) > k:
                 heapq.heappop_max(comps)
             return comps
-        
+
         dist = l2norm(self.sdf, inverted_target_sdf)
 
         # list of complementary SDFs found so far
@@ -149,7 +158,7 @@ class VPTree:
                     heapq.heappop_max(comps)
             if self.near is not None and (len(comps) < k or dist - comps[0][0] <= self.threshold):
                 comps.extend(self.near.searchkcomp(target_sdf, k))
-                
+
         # heapify the comps list and pop elements until only k remain
         heapq.heapify_max(comps)
         while len(comps) > k:
