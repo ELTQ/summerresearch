@@ -21,7 +21,7 @@ def l2norm(sdf1, sdf2):
     return np.sqrt(integral)
 
 def l2norm3d(sdf1, sdf2):
-    quad_func = lambda x: np.power((sdf1(x.T) - sdf2(x.T)),2.0).reshape(-1)
+    quad_func = lambda x: np.power((sdf1(np.atleast_2d(x.T)) - sdf2(np.atleast_2d(x.T))),2.0).reshape(-1)
     integral, error = qmc_quad(quad_func, np.zeros(3), np.ones(3), n_points=1e3)
     print(error)
     return np.sqrt(integral)
@@ -57,7 +57,7 @@ class VPTree:
         other_sdfs = sdfs[1:]
 
         print(len(other_sdfs))
-        l2norms = [l2norm(self.sdf, sdf) for sdf in tqdm(other_sdfs)]
+        l2norms = [l2norm3d(self.sdf, sdf) for sdf in tqdm(other_sdfs)]
 
         # sort the other SDFs based on their L2 norms and find the median to set as the threshold
         order = sorted(range(len(other_sdfs)), key=lambda i: l2norms[i])
@@ -82,12 +82,12 @@ class VPTree:
         if self.leaf is not None:
             neighbors = []
             for sdf in self.leaf:
-                dist = l2norm(sdf, target_sdf)
+                dist = l2norm3d(sdf, target_sdf)
                 heapq.heappush_max(neighbors, (dist, sdf.name, sdf))
             while len(neighbors) > k:
                 heapq.heappop_max(neighbors)
             return neighbors
-        dist = l2norm(self.sdf, target_sdf)
+        dist = l2norm3d(self.sdf, target_sdf)
         # list of nearest neighbors found so far
         neighbors = []
         # pushing the current node's SDF onto the heap
@@ -127,13 +127,13 @@ class VPTree:
         if self.leaf is not None:
             comps = []
             for sdf in self.leaf:
-                dist = l2norm(sdf, inverted_target_sdf)
+                dist = l2norm3d(sdf, inverted_target_sdf)
                 heapq.heappush_max(comps, (dist, sdf.name, sdf))
             while len(comps) > k:
                 heapq.heappop_max(comps)
             return comps
 
-        dist = l2norm(self.sdf, inverted_target_sdf)
+        dist = l2norm3d(self.sdf, inverted_target_sdf)
 
         # list of complementary SDFs found so far
         comps = []
