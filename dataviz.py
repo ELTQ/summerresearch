@@ -8,18 +8,18 @@ import networkx as nx
 import random 
 import matplotlib.pyplot as plt
 
+# global variables
+
 NUM_CIRCLES = 50
 NUM_TRIANGLES = 50
-FIND_NEARBY = 10
-SUCCESS_COLOR = "lightgreen"
-FAIL_COLOR = "maroon"
+FIND_NEARBY = 10 # number of nearby points to find
+SUCCESS_COLOR = "lightgreen" # points that have been determined "closest" to the target
+FAIL_COLOR = "maroon" # points that are not "closest"
 
-def connectToTree(gr, tree):
+def connectToTree(gr, tree): # uses recursion to add objects into our tree. 
     cur_node = tree
     near_child = tree.near
     far_child = tree.far
- 
-    
     if (near_child and near_child.threshold != -1 ):
         if near_child.leaf:
             for leafling in near_child.leaf:
@@ -45,10 +45,6 @@ def connectToTree(gr, tree):
     
 
 # Main
-
-    
-pointx = []
-pointy = []
 points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
 
 shapes = generate_circles(NUM_CIRCLES)
@@ -95,14 +91,11 @@ for my_shape in shapes[FIND_NEARBY:]: # skip the first few, as they've already b
     else:
         heapq.heappush_max(brute_max, root)
 
-
-
 print("Ranking of nearest points (brute force): ")
 brute_hits = [0] * FIND_NEARBY
 for i in range (len(brute_hits)):
     brute_hits[i] = heapq.heappop_max(brute_max)[1].report()
     print(i, ": ", brute_hits[i])
-
 
 # code derived from 
 # https://stackoverflow.com/questions/1388818/how-can-i-compare-two-lists-in-python-and-return-matches
@@ -123,7 +116,6 @@ for node in gr:
         colors.append(SUCCESS_COLOR)
     else:
         colors.append(FAIL_COLOR) # todo: apply a color gradient for close -> far
-
 
 nx.draw_networkx(gr, node_color=colors, pos=pos)
 plt.show()

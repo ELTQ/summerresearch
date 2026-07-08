@@ -4,8 +4,8 @@ from vpt.tree import *
 from vpt.heap import *
 import random 
 
-FIND_NEARBY = 10
-RUNS = 100
+FIND_NEARBY = 5
+RUNS = 5
 count = 0
 right = 0
 wrong = 0
@@ -19,8 +19,8 @@ for loop in range(RUNS):
     pointy = []
     points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
 
-    shapes = generate_circles(50)
-    tris = generate_triangles(50)
+    shapes = generate_circles(30)
+    tris = generate_triangles(0)
 
     shapes += (tris)
 
@@ -40,13 +40,13 @@ for loop in range(RUNS):
     heapq.heapify_max(brute_max) # is this necessary on an empty list? 
     for my_shape in shapes:
         if len(brute_max) < FIND_NEARBY: # if we haven't found enough nearby yet
-            tuple_i = ( rmse(points, my_shape, target), my_shape )
+            tuple_i = ( l2norm(my_shape, target), my_shape )
             heapq.heappush_max(brute_max, tuple_i)
         else: # if there are enough nodes in our max heap
             heapq.heapify_max(brute_max)
             root = heapq.heappop_max(brute_max)
-            if (root[0] > rmse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
-                heapq.heappush_max(brute_max, (rmse(points, my_shape, target), my_shape)) # add it to the heap
+            if (root[0] > l2norm(my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
+                heapq.heappush_max(brute_max, (l2norm(my_shape, target), my_shape)) # add it to the heap
             else:
                 heapq.heappush_max(brute_max, root) # otherwise, put the root back on top
 
@@ -75,8 +75,6 @@ for loop in range(RUNS):
         print("all brute hits: ")
         for hit in brute_hits:
             print(hit)
-        print("points: ")
-        print(points)
         print("target: ")
         print(target)
         print("\n")

@@ -1,7 +1,6 @@
 import heapq
 import numpy as np
 from scipy.integrate import quad,dblquad,qmc_quad
-
 from tqdm import tqdm
 
 # VPTree implementation for SDFs
@@ -47,6 +46,8 @@ class VPTree:
         if not sdfs:
             return
         # if the number of SDFs is less than or equal to the leaf size, make this node a leaf
+        print(len(sdfs))
+        print(self.leaf_size)
         if len(sdfs) <= self.leaf_size:
             self.leaf = sdfs
             self.threshold = 0 # just need something here

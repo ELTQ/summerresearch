@@ -2,8 +2,8 @@ from . import sdfs
 import random
 
 # constants
-MIN_COORD = -300
-MAX_COORD = 300
+MIN_COORD = 0
+MAX_COORD = 500
 RADIUS_RANGE = 7 
 
 '''

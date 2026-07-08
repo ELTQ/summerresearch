@@ -10,8 +10,8 @@ from vpt.tree import *
 # code adapted from https://www.geeksforgeeks.org/python/how-to-draw-a-circle-using-matplotlib-in-python/
 figure, axes = plt.subplots()
 
-axes.set_xlim((-300, 300))
-axes.set_ylim((-300, 300))
+axes.set_xlim((0, 500))
+axes.set_ylim((0, 500))
 axes.set_aspect(1)
 
 FIND_NEARBY = 10
@@ -33,7 +33,7 @@ for loop in range(RUNS):
     pointy = []
     points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(POINTS_NUM)]
 
-    shapes = generate_circles(100)
+    shapes = generate_circles(30)
     tris = generate_triangles(0)
 
     shapes += (tris)
@@ -62,8 +62,8 @@ for loop in range(RUNS):
     furthest_sdf = nearest_hits[0]
 
     for sdf in (nearest_hits):
-        if (rmse(points, target, sdf) > max):
-            max = rmse(points, target, sdf)
+        if (l2norm(target, sdf) > max):
+            max = l2norm(target, sdf)
             furthest_sdf = sdf
     
     radius = furthest_sdf
@@ -73,8 +73,6 @@ for loop in range(RUNS):
     print("furthest is ", int_radius, "units away")
 
     axes.add_artist(plt.Circle(target.midpoint, int_radius, fill = False, color='r')) # radius of 7, filled in
-
-
     # code derived from 
     # https://stackoverflow.com/questions/1388818/how-can-i-compare-two-lists-in-python-and-return-matches
     

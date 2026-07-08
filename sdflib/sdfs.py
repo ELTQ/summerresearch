@@ -7,6 +7,7 @@ from PIL import Image
 import scipy.interpolate
 import scipy.ndimage
 import math
+import trimesh as tri
 
 class SDF:
     def __init__(self): 
@@ -15,6 +16,7 @@ class SDF:
 
     def __str__(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+
 
 
 class circle(SDF):
@@ -30,7 +32,7 @@ class circle(SDF):
 
     def report(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
-    
+
 
 class triangle(SDF):
     def __init__(self, cx, cy):
@@ -68,12 +70,25 @@ class image(SDF):
         ys = np.arange(shape[1])
         self.sdf = scipy.interpolate.RegularGridInterpolator((xs, ys), sdf_arr)
     
-    def __call__(self, x, y):
-        return self.sdf((x, y))
+
+    def __call__(self, pts):
+        return self.sdf(pts)
     
     def __str__(self):
         return (self.name)
 
+class mesh(SDF):
+    def __init__(self, dir):
+        self.name = os.path.basename(dir).split('.')[0]
+        mesh = tri.load_mesh(dir)
+        self.mesh = mesh
+    
+    def __call__(self, pts):
+
+        return tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
+
+    def __str__(self):
+        return (self.name)
 
 
 def compare(self, other, points):

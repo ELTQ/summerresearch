@@ -9,52 +9,49 @@ from vpt.tree import *
 # code adapted from https://www.geeksforgeeks.org/python/how-to-draw-a-circle-using-matplotlib-in-python/
 figure, axes = plt.subplots()
 
-axes.set_xlim((-300, 300))
-axes.set_ylim((-300, 300))
+axes.set_xlim((0, 500))
+axes.set_ylim((0, 500))
 axes.set_aspect(1)
 
-FIND_NEARBY = 10
-RUNS = 1
-POINTS_NUM = 100
+# global variables 
+FIND_NEARBY = 10 # number of SDFs to find near the target SDF
+RUNS = 1 # number of loop iterations 
+POINTS_NUM = 100 # how many testing points will be generated total
 count = 0
 right = 0
-wrong = 0
+wrong = 0 
 first_pos_error_knn = 0
 first_pos_error_brute = 0
+
 
 def plot_sdf_circle(plotted_circle, char_color):
     axes.add_artist(plt.Circle(plotted_circle.midpoint, 7, fill = True, color=char_color)) # radius of 7, filled in
 
 for loop in range(RUNS):
-    # Main
 
-    pointx = []
-    pointy = []
     points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(POINTS_NUM)]
 
-    shapes = generate_circles(100)
-    tris = generate_triangles(0)
-
+    shapes = generate_circles(100) # all circles for now
+    tris = generate_triangles(0) # you can add triangles into the mix too, if desired
     shapes += (tris)
 
     tree = VPTree(points, shapes)
     tree.split()
 
     target = generate_circles(1)[0]
-
     plot_sdf_circle(target, 'g')
 
     # using the brute force method
     brute_max = []
     for my_shape in shapes:
         if len(brute_max) < FIND_NEARBY: # if we haven't found enough nearby yet
-            tuple_i = ( rmse(points, my_shape, target), my_shape )
+            tuple_i = ( l2norm(my_shape, target), my_shape )
             heapq.heappush_max(brute_max, tuple_i)
         else: # if there are enough nodes in our max heap
             heapq.heapify_max(brute_max)
             root = heapq.heappop_max(brute_max)
             if (root[0] > rmse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
-                heapq.heappush_max(brute_max, (rmse(points, my_shape, target), my_shape)) # add it to the heap
+                heapq.heappush_max(brute_max, (l2norm(my_shape, target), my_shape)) # add it to the heap
             else:
                 heapq.heappush_max(brute_max, root) # otherwise, put the root back on top
 
