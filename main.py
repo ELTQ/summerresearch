@@ -7,40 +7,38 @@ from vpt.tree import VPTree, rmse
 import cv2
 from PIL import Image, ImageOps
 import matplotlib.pyplot as plt
-'''
 
 
-'''
-mpeg7_imgs = "C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets"
 
-mimg = Image.open("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_inverted.gif")
-"""
-for frame in range(-90, 90, 10):
-    mimg = mimg.rotate(10, expand=False)
-    mimg.save("C:\\Users\\qiuel\\summerresearch\\part1\\keys_and_pockets\\mickey_key_" + str(frame) + ".gif")
-"""
+
+
+shrec = "C:\\Users\\qiuel\\summerresearch\\part1\\shrec11_stl"
+
+shrec_samp = ("C:\\Users\\qiuel\\summerresearch\\part1\\shrec11_stl\\T0.stl")
 
 
 shapes = []
-for img in os.listdir(mpeg7_imgs):
-    if not img.endswith('.gif'):
+for img in os.listdir(shrec):
+    if not img.endswith('.stl'):
         continue
-    shapes.append(sdfs.image(os.path.join(mpeg7_imgs, img)))
+    shapes.append(sdfs.mesh(os.path.join(shrec, img)))
 
 
 for shape in shapes:
-    if shape.name == "mickey_key_inverted":
-        mickey_pocket = shape
+    if shape.name == "T0.stl":
+        t0 = shape
         break
 
 tree = VPTree(shapes[:])
 tree.split()
-print("target is " + mickey_pocket.name)
+print("target is " + t0.name)
 
-others = sorted(tree.searchkcomp(mickey_pocket, 4))
+others = sorted(tree.searchkcomp(t0, 4))
 
 print("the k nearest complements are", others)
 
+
+"""
 DEN = 32
 
 xv, yv = np.meshgrid(np.linspace(0,1,DEN),np.linspace(0,1,DEN))
@@ -57,3 +55,4 @@ for i in range(len(others)):
     ax[i+1].matshow(evaluated.reshape(DEN,DEN).T)
 
 plt.show()
+"""
