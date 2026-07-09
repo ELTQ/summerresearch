@@ -7,6 +7,8 @@ from PIL import Image
 import scipy.interpolate
 import scipy.ndimage
 import math
+import trimesh as tri
+
 
 class SDF:
     def __init__(self):
@@ -70,6 +72,24 @@ class image(SDF):
 
     def __call__(self, pts):
         return self.sdf(pts)
+
+
+# sdf subclass for 3D mesh
+class mesh(SDF):
+    def __init__(self, dir):
+        self.name = os.path.basename(dir).split('.')[0]
+        mesh = tri.load_mesh(dir)
+        mesh.apply_translation(-mesh.bounds[0])
+        scale = 1 / mesh.extents.max()
+        mesh.apply_scale(scale)
+        self.mesh = mesh
+    
+    def __call__(self, pts):
+
+        return tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
+
+
+
 
 
 
