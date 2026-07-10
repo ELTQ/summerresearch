@@ -38,7 +38,7 @@ for loop in range(RUNS):
 
     shapes += (tris)
 
-    tree = VPTree(points, shapes)
+    tree = VPTree_2D(points, shapes)
     tree.split()
 
     target = generate_circles(1)[0]

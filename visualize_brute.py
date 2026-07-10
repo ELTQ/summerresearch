@@ -35,7 +35,7 @@ for loop in range(RUNS):
     tris = generate_triangles(0) # you can add triangles into the mix too, if desired
     shapes += (tris)
 
-    tree = VPTree(points, shapes)
+    tree = VPTree_2D(points, shapes)
     tree.split()
 
     target = generate_circles(1)[0]
@@ -50,7 +50,7 @@ for loop in range(RUNS):
         else: # if there are enough nodes in our max heap
             heapq.heapify_max(brute_max)
             root = heapq.heappop_max(brute_max)
-            if (root[0] > rmse(points, my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
+            if (root[0] > l2norm(my_shape, target)): # if the furthest distance of our chosen points is greater than the shape we've found,
                 heapq.heappush_max(brute_max, (l2norm(my_shape, target), my_shape)) # add it to the heap
             else:
                 heapq.heappush_max(brute_max, root) # otherwise, put the root back on top

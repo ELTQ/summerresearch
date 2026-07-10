@@ -13,10 +13,8 @@ class SDF:
     def __init__(self): 
         self.name = "null"
         self.midpoint = (0, 0)
-
     def __str__(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
-
 
 
 class circle(SDF):
@@ -24,10 +22,10 @@ class circle(SDF):
         self.name = "circle"
         self.midpoint = (cx, cy)
 
-    def __call__(self, x, y, r = 1.0):
+    def __call__(self, target_point, r = 1.0):
         cx = self.midpoint[0]
         cy = self.midpoint[1]
-        distance = math.dist((cx, cy), (x, y)) - r
+        distance = math.dist((cx, cy), (target_point[0], target_point[1])) - r
         return distance
 
     def report(self):
@@ -91,12 +89,9 @@ class mesh(SDF):
         return (self.name)
 
 
-def compare(self, other, points):
+def compare_shapes(self, other, points):
     # compare two SDFs 
     total = 0
     for x, y in points:
-        total += (self.func(self, x, y) - other.func(other, x, y)) ** 2
+        total += (self(self, x, y) - other(other, x, y)) ** 2
     return (total / len(points))
-    
-
-        
