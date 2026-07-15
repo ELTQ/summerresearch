@@ -15,8 +15,8 @@ if __name__ == "__main__":
     shrec = "shrec11_stl"
     shrec_samp = "shrec11_stl/T0.stl"
 
-    cube_meshes = "meshes"
-    cube_standard = "meshes/0.stl"
+    cube_meshes = "unions"
+    cube_standard = "unions/union0.stl"
 
     print(os.listdir(cube_meshes))
     chosen_stl_path = input("Which .stl would you like to compare? [e.g. '0.stl']: ")
@@ -33,8 +33,8 @@ if __name__ == "__main__":
     tree = VPTree(points, shapes)
     tree.split()
     print("target is " + neutral_point.name)
-    others = sorted(tree.searchkcomp(neutral_point, int(chosen_count)))
-    print("the k nearest complements are", others)
+    others = sorted(tree.searchkNN(neutral_point, int(chosen_count)))
+    print("the k nearest neighbors are", others)
 
     """
     DEN = 32

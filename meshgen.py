@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 box = trimesh.creation.box(extents=[1,1,1])
-folder ="C:\\Users\\qiuel\\summerresearch\\part1\\meshes"
+folder ="meshes"
 
 for i in range(0, 90, 10):
     radian = np.radians(i)

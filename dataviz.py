@@ -55,7 +55,7 @@ tris = generate_triangles(NUM_TRIANGLES)
 
 shapes += (tris)
 
-tree = VPTree(points, shapes)
+tree = VPTree_2D(points, shapes)
 tree.split()
 near_branch = tree.near
 far_branch = tree.far
@@ -75,19 +75,19 @@ full_result_knn = tree.searchkNN(target, FIND_NEARBY)
 
 print("Ranking of nearest points:")
 for i in range (len(nearest_hits)):
-    nearest_hits[i] = full_result_knn[i][1].report()
+    nearest_hits[i] = full_result_knn[i][1]
     print(i, ": ", full_result_knn[i][0], ", ", full_result_knn[i][1])
 
 brute_max = []
 heapq.heapify_max(brute_max)
 
 for i in range(FIND_NEARBY):
-    heapq.heappush_max(brute_max, ( mse(points, shapes[i], target), shapes[i]) )
+    heapq.heappush_max(brute_max, ( l2norm( shapes[i], target), shapes[i]) )
 
 for my_shape in shapes[FIND_NEARBY:]: # skip the first few, as they've already been added
     root = heapq.heappop_max(brute_max)
-    if (root[0] > mse(points, my_shape, target)):
-        heapq.heappush_max( brute_max, (mse(points, my_shape, target), my_shape))
+    if (root[0] > l2norm( my_shape, target)):
+        heapq.heappush_max( brute_max, (l2norm(my_shape, target), my_shape))
     else:
         heapq.heappush_max(brute_max, root)
 
@@ -119,4 +119,3 @@ for node in gr:
 
 nx.draw_networkx(gr, node_color=colors, pos=pos)
 plt.show()
-

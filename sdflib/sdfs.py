@@ -15,6 +15,9 @@ class SDF:
         self.midpoint = (0, 0)
     def __str__(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
+    def report(self):
+        return (self.name)
+
 
 
 class circle(SDF):
@@ -37,10 +40,11 @@ class triangle(SDF):
         self.name = "triangle"
         self.midpoint = (cx, cy)
 
-    def __call__(self, x, y, r = 1.0):
+    def __call__(self, target_point, r = 1.0):
         cx = self.midpoint[0]
         cy = self.midpoint[1]
-
+        x = target_point[0]
+        y = target_point[1]
         k = math.sqrt(3.0) # number of sides?
         x = abs(x) - r
         y = abs(y) + r/k
@@ -75,18 +79,37 @@ class image(SDF):
     def __str__(self):
         return (self.name)
 
-class mesh(SDF):
+# sdf subclass for 3D mesh
+class mesh(SDF): # negative inside mesh, positive outside mesh
     def __init__(self, dir):
         self.name = os.path.basename(dir).split('.')[0]
+        self.midpoint = (0, 0)
         mesh = tri.load_mesh(dir)
+        mesh.apply_translation(-mesh.bounds[0])
+        scale = 1 / mesh.extents.max()
+        mesh.apply_scale(scale)
+        self.mesh = mesh
+    
+    def __call__(self, pts):
+        return -tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
+
+
+# sdf subclass for inverted 3D mesh
+class invert_mesh(SDF): # positive inside mesh, negative outside mesh
+    def __init__(self, dir):
+        self.name = str("Inverted " + os.path.basename(dir).split('.')[0])
+        self.midpoint = (0, 0)
+        mesh = tri.load_mesh(dir)
+        mesh.apply_translation(-mesh.bounds[0])
+        scale = 1 / mesh.extents.max()
+        mesh.apply_scale(scale)
         self.mesh = mesh
     
     def __call__(self, pts):
 
         return tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
 
-    def __str__(self):
-        return (self.name)
+
 
 
 def compare_shapes(self, other, points):
