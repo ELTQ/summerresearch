@@ -86,7 +86,7 @@ class mesh(SDF):
     
     def __call__(self, pts):
 
-        return tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
+        return -tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
 
 
 # sdf subclass for inverted 3D mesh
