@@ -6,6 +6,7 @@ MIN_COORD = 0
 MAX_COORD = 500
 RADIUS_RANGE = 7 
 
+
 '''
 Generate a list of random circle SDFs to stress test our tree code. 
 Parameters: 
@@ -22,6 +23,14 @@ def generate_circles(count):
 
         circles[i] = sdfs.circle(x_coord, y_coord)
     return circles
+
+'''
+Generate a list of random equilateral SDFs to stress test our tree code. 
+Parameters: 
+    count: the number of requested triangle SDFs
+Returns:
+    a list of triangles at random positions
+'''
 
 def generate_triangles(count):
 

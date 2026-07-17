@@ -1,35 +1,42 @@
+'''
+brute_test.py 
+Tests whether the searchKNN method returns the same results as a similar method using brute force.
+Currently only tests using the built-in circles and triangles.
+'''
+
+# import statements
 from sdflib.generate_sdfs import *
 from sdflib.sdfs import *
 from vpt.tree import *
 from vpt.heap import *
 import random 
 
-FIND_NEARBY = 5
-RUNS = 5
+# global variable declarations
+FIND_NEARBY = 5 # how many SDFs to find near our chosen target
+RUNS = 5 # the number of runs to test our code with
+
+# initializations
 count = 0
-right = 0
-wrong = 0
-first_pos_error_knn = 0
-first_pos_error_brute = 0
+right = 0 # number of times the brute and KNN methods agree
+wrong = 0 # number of times the brute and KNN methods disagree
+first_pos_error_knn = 0 # when the brute and KNN methods were giving different results, oftentimes the first element of the list would differ.
+first_pos_error_brute = 0 # these variables were created to keep track of when that happens
 
+# main
 for loop in range(RUNS):
-    # Main
 
-    pointx = []
-    pointy = []
     points = [(random.randint(-300, 300), random.randint(-300, 300)) for i in range(20)]
 
-    shapes = generate_circles(30)
+    shapes = generate_circles(30) # these two lines can be altered to choose how many circles or triangles are in our list
     tris = generate_triangles(0)
-
     shapes += (tris)
 
-    tree = VPTree(points, shapes)
+    tree = VPTree_2D(points, shapes) # creates our VP tree with the given random points
     tree.split()
 
     target = generate_circles(1)[0]
 
-    # using the k-nearest neighbors method
+    # using the k-nearest neighbors method by traversing our tree
     full_result_knn = tree.searchkNN(target, FIND_NEARBY)
     nearest_hits = [0] * FIND_NEARBY
     for i in range (len(nearest_hits)):
@@ -58,17 +65,22 @@ for loop in range(RUNS):
 
     # code derived from 
     # https://stackoverflow.com/questions/1388818/how-can-i-compare-two-lists-in-python-and-return-matches
-    if len(set(brute_hits) & set(nearest_hits)) == FIND_NEARBY: # comparing the actual descriptions, as the references to the SDFs may have changed at this point
+    if len(set(brute_hits) & set(nearest_hits)) == FIND_NEARBY: # comparing the actual descriptions, as the memory locations of the SDFs may have changed at this point
         print("good job!")
         right += 1
+
+    # failure condition
     else:
         print("FAILURE at iteration ", loop)
         wrong += 1
+
+        # creates lists of differences between the KNN and brute force methods
         unique_knn = list(set(nearest_hits).difference(set(brute_hits)))
         unique_brute = list(set(brute_hits).difference(set(nearest_hits)))
           
         print(unique_knn, "was only in the KNN method")
         print(unique_brute, "was only in the Brute method")
+        
         print("all knn hits: ")
         for hit in nearest_hits:
             print(hit)
@@ -78,6 +90,8 @@ for loop in range(RUNS):
         print("target: ")
         print(target)
         print("\n")
+
+        # tallies the first position differences
         if unique_knn[0] == nearest_hits[0]:
             first_pos_error_knn += 1
         if unique_brute[0] == brute_hits[0]:

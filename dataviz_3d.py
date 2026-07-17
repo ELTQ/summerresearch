@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 # global variables
 
+MESH_PATH = "unions"
 TARGET_PATH = "unions/union0.stl"
 FIND_NEARBY = 7 # number of nearby points to find
 SUCCESS_COLOR = "lightgreen" # points that have been determined "closest" to the target
@@ -45,20 +46,41 @@ def connectToTree(gr, tree): # uses recursion to add objects into our tree.
 # Main
 
 if __name__ == "__main__":
+    k = 3
+    getting_input = True
+    while getting_input: 
+        print(os.listdir(MESH_PATH))
+        chosen_stl = input("Which file would you like to find the K compliments of? [e.g. union0.stl]: ")
+        if chosen_stl not in os.listdir(MESH_PATH):
+            print("Invalid choice, try again")
+            continue
+        comp_near_choice = input("Would you like to find the K nearest neighbors of K nearest compliments [neighbors / compliments]: ")
+        if comp_near_choice == "neighbors" or comp_near_choice == "Neighbors":
+            k = input("How many neighbors would you like to find: ")
+            if str.isnumeric(k):
+                k = int(k)
+                getting_input = False
+            else:
+                print("Invalid input, try again")
+                continue
+        elif comp_near_choice == "compliments" or comp_near_choice == "Compliments":
+            k = input("How many compliments would you like to find: ")
+            if str.isnumeric(k):
+                k = int(k)
+                getting_input = False
+            else:
+                print("Invalid input, try again")
+                continue
+        else: 
+            print("Invalid input, try again")
+            continue
 
     shapes = []
-    mesh_path = "unions"
-    for mesh in os.listdir(mesh_path):
+    for mesh in os.listdir(MESH_PATH):
         if not mesh.endswith('.stl'):
             continue
-        shapes.append(sdfs.mesh(os.path.join(mesh_path, mesh)))
-        shapes.append(sdfs.invert_mesh(os.path.join(mesh_path, mesh)))
-
-
-
-
-    # shapes.append( sdfs.SDF(sdfs.SDF.circle, 10000000000, 100000000))
-
+        shapes.append(sdfs.mesh(os.path.join(MESH_PATH, mesh)))
+        shapes.append(sdfs.invert_mesh(os.path.join(MESH_PATH, mesh)))
 
     tree = VPTree(shapes)
     tree.split()
@@ -72,11 +94,14 @@ if __name__ == "__main__":
     gr.add_edge(tree.sdf.report(), far_branch.sdf.report())
     print(gr)
 
-    target = sdfs.mesh(TARGET_PATH)
+    target = sdfs.mesh(chosen_stl)
     print("target is", target)
 
-    nearest_hits = [0] * FIND_NEARBY
-    full_result_knn = tree.searchkcomp(target, FIND_NEARBY)
+    nearest_hits = [0] * k
+    if (comp_near_choice == "compliments" or comp_near_choice == "Compliments" ):
+        full_result_knn = tree.searchkcomp(target, k)
+    elif (comp_near_choice == "neighbors" or comp_near_choice == "Neighbors"):
+        full_result_knn = tree.searchKNN(target, k)
 
     print("Ranking of nearest points:")
     for i in range (len(nearest_hits)):
@@ -99,5 +124,5 @@ if __name__ == "__main__":
             colors.append(FAIL_COLOR) # todo: apply a color gradient for close -> far
 
     nx.draw_networkx(gr, node_color=colors, pos=pos)
-    plt.title("finding complements of unions")
+    plt.title("finding", comp_near_choice, "of unions")
     plt.show()
