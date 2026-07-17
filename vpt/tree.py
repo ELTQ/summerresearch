@@ -3,8 +3,12 @@ import numpy as np
 from scipy.integrate import quad,dblquad,qmc_quad
 from tqdm import tqdm
 
-# VPTree implementation for SDFs
+"""
+VPTree implementation for SDFs
 
+Using L2norm to calculate how similar two SDFs are
+Build a Vantage Point Tree based on the SDFs similarity
+"""
 # calculate squred root mean squared error between two SDFs over a set of points
 def rmse(points, sdf1, sdf2):
     total = 0
