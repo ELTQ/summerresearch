@@ -1,4 +1,4 @@
-
+# import statements
 import numpy as np
 import os
 import trimesh
@@ -23,7 +23,7 @@ def rand_sphere_union(n):
     return spheres
 
 
-union_dir = "C:\\Users\\qiuel\\summerresearch\\part1\\unions"
+union_dir = "unions"
 
 # generate 20 union shapes each made with 20 spheres
 for i in range(20):

@@ -34,6 +34,7 @@ for loop in range(RUNS):
     tree = VPTree_2D(points, shapes) # creates our VP tree with the given random points
     tree.split()
 
+    # creates a list of random circles of length 1, and gets the first object from that list
     target = generate_circles(1)[0]
 
     # using the k-nearest neighbors method by traversing our tree
