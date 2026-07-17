@@ -9,7 +9,7 @@ import scipy.ndimage
 import math
 import trimesh as tri
 
-
+# SDF parent class
 class SDF:
     def __init__(self):
         self.name = "null"
@@ -18,7 +18,7 @@ class SDF:
     def __str__(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
 
-
+# SDF subclass for circle function
 class circle(SDF):
     def __init__(self, cx, cy):
         self.name = "circle"
@@ -33,7 +33,7 @@ class circle(SDF):
     def report(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
 
-
+# SDF subclass for triangle function
 class triangle(SDF):
     def __init__(self, cx, cy):
         self.name = "triangle"
@@ -55,6 +55,7 @@ class triangle(SDF):
     def report(self):
         return (self.name + " at " + str(self.midpoint[0]) + ", " + str(self.midpoint[1]))
 
+# SDF subclass for 2d images 
 class image(SDF):
     def __init__(self, dir):
         self.name = os.path.basename(dir).split('.')[0]
@@ -89,7 +90,7 @@ class mesh(SDF):
         return -tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
 
 
-# sdf subclass for inverted 3D mesh
+# sdf subclass for inverted 3D mesh normalized on 0,1 box
 class invert_mesh(SDF):
     def __init__(self, dir):
         self.name = os.path.basename(dir).split('.')[0]
@@ -98,10 +99,11 @@ class invert_mesh(SDF):
         scale = 1 / mesh.extents.max()
         mesh.apply_scale(scale)
         self.mesh = mesh
-    
+
     def __call__(self, pts):
 
         return tri.proximity.signed_distance(self.mesh, pts) # returns the distance to a (x, y, z) point. 
+
 
 
 
