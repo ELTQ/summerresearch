@@ -14,4 +14,4 @@ Signed distance function can be a way to represent 3D shapes, we used it to repr
 Currently we successfully implemented the Vantage Point Tree data sturcture and compliment search function. We are able to upload stl files for simulated protein shapes and correctly getting k similar and complimentary shapes.
 
 # Future work
-We are planning to work on applying current work on actual protein dataset, solve the problem of cropping the binding site of proteins and finding the optimal positions in the 3D space for those proteins.
+We are planning to work on applying current work on actual protein dataset (Plinder), solve the problem of cropping the binding site of proteins and finding the optimal positions in the 3D space for those proteins.
